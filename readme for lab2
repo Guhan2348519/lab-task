@@ -1,0 +1,88 @@
+                                                                                                       LAB TASK-2
+step1:first section explains how to get started with your project, including the purpose of each library and how to load your dataset using `pd.read_excel()`.
+step2:To get an initial look at the dataset, you can use the `head()` function to display the first 10 rows of the DataFrame:
+df.head(10)
+step3: how to clean and explore the data using df.isnull().sum()
+ df['Product_Search_Method'].fillna('Keyword', inplace=True).
+step4:
+To categorize the 'age' column into age groups, we first define age bins and corresponding labels:
+age_bins = [18, 26, 36, 46, float('inf')]
+age_labels = ['18-25', '26-35', '36-45', '46+']
+step5:## Data Visualization: Distribution of Customers Across Age Groups
+We start by setting the style of the Seaborn plot to "whitegrid" and creating a figure with a specified size:
+sns.set(style="whitegrid")
+plt.figure(figsize=(8, 6))
+step6:Dropping Unnecessary Columns
+To streamline the dataset and focus on relevant information, we remove certain columns from the DataFrame. In this case, we drop the following columns:
+'Review_Helpfulness'
+'Improvement_Areas'
+'Product_Search_Method'
+df = df.drop(['Review_Helpfulness', 'Improvement_Areas', 'Product_Search_Method'], axis=1)
+step7:
+### One-Hot Encoding 'Gender'
+Categorical variables, such as 'Gender,' need to be transformed into a numerical format for many machine learning algorithms. In this step, we perform one-hot encoding on the 'Gender' column to convert it into binary columns.
+We use the `pd.get_dummies()` function for this purpose. Specifically, we pass the 'Gender' column as a list to the 'columns' parameter to indicate which column to encode. Additionally, we use the 'prefix' parameter to add a prefix to the new binary columns to easily identify them.
+df = pd.get_dummies(df, columns=['Gender'], prefix='Gender')
+Certain machine learning algorithms require categorical data to be transformed into numerical format. In this step, we perform label encoding on the 'Purchase_Frequency' column.
+We use the `LabelEncoder` from Scikit-Learn for this purpose. The label encoding process assigns a unique integer to each category in the column. This transformation makes it possible to use the 'Purchase_Frequency' column in machine learning models.
+from sklearn.preprocessing import LabelEncoder
+label_encoder = LabelEncoder()
+df['Purchase_Frequency'] = label_encoder.fit_transform(df['Purchase_Frequency'])
+sep8:Data Visualization: Scatter Plot - Age vs. Rating Accuracy
+To explore the relationship between age and rating accuracy, we create a scatter plot using Seaborn. In this plot:
+The 'x' axis represents the 'age' of customers.
+The 'y' axis represents the 'Rating' accuracy.
+ Plot Title and Axis Labels
+We add a title to the plot to provide context, and we label the x and y axes for clarity:
+Title: "Scatter Plot: Age vs. Rating Accuracy"
+X-axis Label: "Age"
+Y-axis Label: "Rating Accuracy"
+Displaying the Plot
+Calculating Correlation
+To quantify the relationship between the 'age' of customers and their 'Rating' accuracy, we calculate the correlation coefficient. The correlation coefficient measures the strength and direction of the linear relationship between two variables.
+correlation = df['age'].corr(df['Rating'])
+ting accuracy for the dataset.
+This visualization helps us understand any potential patterns or correlations between age and rating accuracy.
+To understand the relationships and patterns between 'age' and 'Rating' in the dataset, we calculate the covariance matrix. The covariance matrix provides information about how variables co-vary with each other.
+data = df[['age', 'Rating']].to_numpy()
+Calculating the covariance matrix using np.cov(). We set 'rowvar=False' to indicate that each column represents a variable.
+covariance_matrix = np.cov(data, rowvar=False)
+To visualize the relationships between 'age' and 'Rating' more intuitively, we generate a heatmap of the covariance matrix. A heatmap uses color intensity to represent the strength and direction of relationships between variables.
+plt.figure(figsize=(8, 6))
+
+# Creating a heatmap with the covariance matrix
+# We use 'annot=True' to display values in each cell, 'fmt='.2f' to format them as decimals,
+# 'cmap='coolwarm'' for the color map, and set x and y tick labels for clarity.
+sns.heatmap(covariance_matrix, annot=True, fmt='.2f', cmap='coolwarm',
+            xticklabels=['age', 'Rating'], yticklabels=['age', 'Rating'])
+# Adding a title to the heatmap
+plt.title("Covariance Matrix Heatmap")
+To determine whether there is a significant difference in 'Rating' between the 'Male' and 'Female' groups in the dataset, we conduct an independent two-sample t-test. This statistical test helps us evaluate whether the means of the two groups are significantly different.
+# Extracting 'Rating' values for 'Male' and 'Female' groups
+male_ratings = df[df['Gender'] == 'Male']['Rating']
+female_ratings = df[df['Gender'] == 'Female']['Rating']
+# Calculating the t-statistic and p-value using scipy.stats.ttest_ind()
+t_statistic, p_value = stats.ttest_ind(male_ratings, female_ratings)
+# Setting the significance level (alpha)
+alpha = 0.05
+# Checking the p-value against the significance level
+if p_value < alpha:
+    print("There is a significant difference in Rating between Male and Female groups.")
+else:
+    print("There is no significant difference in Rating between Male and Female groups.")
+# Printing the calculated t-statistic
+print("T-statistic:", t_statistic)
+## Data Visualization: Box Plot - Rating Accuracy by Purchase Frequency
+To explore how 'Rating' accuracy varies across different 'Purchase Frequency' categories, we create a box plot. This type of plot provides a visual representation of the distribution of 'Rating' accuracy within each category.
+plt.figure(figsize=(8, 6))
+
+# Creating a box plot using Seaborn
+# 'x' represents the 'Purchase Frequency' column, and 'y' represents the 'Rating' column from the DataFrame 'df'.
+sns.boxplot(x='Purchase_Frequency', y='Rating', data=df)
+# Adding a title to the plot
+plt.title("Box Plot: Rating Accuracy by Purchase Frequency")
+# Labeling the x and y axes
+plt.xlabel("Purchase Frequency")
+plt.ylabel("Rating Accuracy")
+# Displaying the box plot
+plt.show()
